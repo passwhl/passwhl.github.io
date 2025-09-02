@@ -170,7 +170,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://b.wguan.top/2025/09/01/2025/test/">
+    <link itemprop="mainEntityOfPage" href="https://b.wguan.top/2025/09/01/2025/ionic3%E5%8D%87%E7%BA%A7node20/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -184,7 +184,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2025/09/01/2025/test/" class="post-title-link" itemprop="url">测试文章目录</a>
+            <a href="/2025/09/01/2025/ionic3%E5%8D%87%E7%BA%A7node20/" class="post-title-link" itemprop="url">Ionic3升级node20</a>
         </h2>
 
         <div class="post-meta">
@@ -193,10 +193,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2025-09-01 16:00:00 / 修改时间：08:43:35" itemprop="dateCreated datePublished" datetime="2025-09-01T16:00:00+00:00">2025-09-01</time>
+              <time title="创建时间：2025-09-01 16:00:00" itemprop="dateCreated datePublished" datetime="2025-09-01T16:00:00+00:00">2025-09-01</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-09-02 02:52:44" itemprop="dateModified" datetime="2025-09-02T02:52:44+00:00">2025-09-02</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -208,7 +214,7 @@
             </span>
 
           
-            <span id="/2025/09/01/2025/test/" class="post-meta-item leancloud_visitors" data-flag-title="测试文章目录" title="阅读次数">
+            <span id="/2025/09/01/2025/ionic3%E5%8D%87%E7%BA%A7node20/" class="post-meta-item leancloud_visitors" data-flag-title="Ionic3升级node20" title="阅读次数">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -225,7 +231,22 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>测试文章目录</p>
+          <h1 id="Ionic3升级node20"><a href="#Ionic3升级node20" class="headerlink" title="Ionic3升级node20"></a>Ionic3升级node20</h1><h2 id="已修改"><a href="#已修改" class="headerlink" title="已修改:"></a>已修改:</h2><h3 id="1-ionic-app-script-3-2-5-tgz-点击下载"><a href="#1-ionic-app-script-3-2-5-tgz-点击下载" class="headerlink" title="1. ionic-app-script-3.2.5.tgz 点击下载"></a>1. ionic-app-script-3.2.5.tgz <a href="/public/ionic-app-script-3.2.5.tgz">点击下载</a></h3><ul>
+<li>node-sass依赖库迁移改为sass  <h3 id="2-ng-packagr-3-0-6-tgz-点击下载"><a href="#2-ng-packagr-3-0-6-tgz-点击下载" class="headerlink" title="2. ng-packagr-3.0.6.tgz 点击下载"></a>2. ng-packagr-3.0.6.tgz <a href="/public/ng-packagr-3.0.6.tgz">点击下载</a></h3></li>
+<li>node_modules&#x2F;ng-packagr&#x2F;lib&#x2F;ng-v5&#x2F;entry-point&#x2F;resources&#x2F;stylesheet.transform.js中的node-sass使用迁移到sass</li>
+</ul>
+<h3 id="3-ion-angular-3-9-10-patch-点击下载"><a href="#3-ion-angular-3-9-10-patch-点击下载" class="headerlink" title="3.ion-angular+3.9.10.patch 点击下载"></a>3.ion-angular+3.9.10.patch <a href="/public/ion-angular+3.9.10.patch">点击下载</a></h3><ul>
+<li>使用补丁工具实现node_modules&#x2F;ionic-angular&#x2F;themes&#x2F;ionic.functions.scss中node-sass使用迁移到sass</li>
+</ul>
+<h3 id="4-x2F-deep-x2F-使用"><a href="#4-x2F-deep-x2F-使用" class="headerlink" title="4.&#x2F;deep&#x2F;使用"></a>4.&#x2F;deep&#x2F;使用</h3><ul>
+<li>替换为 ::ng-deep</li>
+</ul>
+<h3 id="5-scss中color使用要在全局scss定义方法"><a href="#5-scss中color使用要在全局scss定义方法" class="headerlink" title="5. scss中color使用要在全局scss定义方法"></a>5. scss中color使用要在全局scss定义方法</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">@function color($map-name, $key) &#123;</span><br><span class="line">  @return map-get($map-name, $key);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-tsconfig-json修改"><a href="#6-tsconfig-json修改" class="headerlink" title="6. tsconfig.json修改"></a>6. tsconfig.json修改</h3><ul>
+<li>compilerOptions中加上”types”: [“node”]</li>
+</ul>
+<p>** 将以上tgz通过npm i .&#x2F;<em>&#x2F;</em>.tgz安装<br>** 将补丁通过patch-package使用<br>** 原理是将node-sass迁移到node，解除对node版本的强依赖</p>
 
       
     </div>
@@ -245,7 +266,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://b.wguan.top/2023/02/28/fanbianyi/">
+    <link itemprop="mainEntityOfPage" href="https://b.wguan.top/2023/02/28/2021/fanbianyi/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -259,7 +280,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/02/28/fanbianyi/" class="post-title-link" itemprop="url">APK反编译</a>
+            <a href="/2023/02/28/2021/fanbianyi/" class="post-title-link" itemprop="url">APK反编译</a>
         </h2>
 
         <div class="post-meta">
@@ -289,7 +310,7 @@
             </span>
 
           
-            <span id="/2023/02/28/fanbianyi/" class="post-meta-item leancloud_visitors" data-flag-title="APK反编译" title="阅读次数">
+            <span id="/2023/02/28/2021/fanbianyi/" class="post-meta-item leancloud_visitors" data-flag-title="APK反编译" title="阅读次数">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -309,7 +330,7 @@
           <p>APK反编译修改后重新打包</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2023/02/28/fanbianyi/#more" rel="contents">
+              <a class="btn" href="/2023/02/28/2021/fanbianyi/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -333,7 +354,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://b.wguan.top/2021/11/01/termux/">
+    <link itemprop="mainEntityOfPage" href="https://b.wguan.top/2021/11/01/2021/termux/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -347,7 +368,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/11/01/termux/" class="post-title-link" itemprop="url">termux基础</a>
+            <a href="/2021/11/01/2021/termux/" class="post-title-link" itemprop="url">termux基础</a>
         </h2>
 
         <div class="post-meta">
@@ -377,7 +398,7 @@
             </span>
 
           
-            <span id="/2021/11/01/termux/" class="post-meta-item leancloud_visitors" data-flag-title="termux基础" title="阅读次数">
+            <span id="/2021/11/01/2021/termux/" class="post-meta-item leancloud_visitors" data-flag-title="termux基础" title="阅读次数">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -397,7 +418,7 @@
           <p>废旧手机再利用，使用termux搭建服务器</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2021/11/01/termux/#more" rel="contents">
+              <a class="btn" href="/2021/11/01/2021/termux/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -421,7 +442,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://b.wguan.top/2021/09/22/code-push/">
+    <link itemprop="mainEntityOfPage" href="https://b.wguan.top/2021/09/22/2021/h5-rtsp-rtmp/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -435,7 +456,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/09/22/code-push/" class="post-title-link" itemprop="url">code-push</a>
+            <a href="/2021/09/22/2021/h5-rtsp-rtmp/" class="post-title-link" itemprop="url">h5播放rtsp/rtmp</a>
         </h2>
 
         <div class="post-meta">
@@ -465,95 +486,7 @@
             </span>
 
           
-            <span id="/2021/09/22/code-push/" class="post-meta-item leancloud_visitors" data-flag-title="code-push" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>ionic&#x2F;cordova使用code-push更新js资产变更</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/09/22/code-push/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://b.wguan.top/2021/09/22/h5-rtsp-rtmp/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="passwhl">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="过客">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/09/22/h5-rtsp-rtmp/" class="post-title-link" itemprop="url">h5播放rtsp/rtmp</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-09-22 17:40:00" itemprop="dateCreated datePublished" datetime="2021-09-22T17:40:00+00:00">2021-09-22</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2025-09-01 08:38:15" itemprop="dateModified" datetime="2025-09-01T08:38:15+00:00">2025-09-01</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">记录</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/2021/09/22/h5-rtsp-rtmp/" class="post-meta-item leancloud_visitors" data-flag-title="h5播放rtsp/rtmp" title="阅读次数">
+            <span id="/2021/09/22/2021/h5-rtsp-rtmp/" class="post-meta-item leancloud_visitors" data-flag-title="h5播放rtsp/rtmp" title="阅读次数">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -573,7 +506,7 @@
           <p>借助VLC串流，使用h5video播放rtsp&#x2F;rtmp流</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2021/09/22/h5-rtsp-rtmp/#more" rel="contents">
+              <a class="btn" href="/2021/09/22/2021/h5-rtsp-rtmp/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -597,7 +530,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://b.wguan.top/2021/09/22/hexo-html/">
+    <link itemprop="mainEntityOfPage" href="https://b.wguan.top/2021/09/22/2021/hexo-html/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -611,7 +544,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/09/22/hexo-html/" class="post-title-link" itemprop="url">使用html写文章</a>
+            <a href="/2021/09/22/2021/hexo-html/" class="post-title-link" itemprop="url">使用html写文章</a>
         </h2>
 
         <div class="post-meta">
@@ -641,7 +574,7 @@
             </span>
 
           
-            <span id="/2021/09/22/hexo-html/" class="post-meta-item leancloud_visitors" data-flag-title="使用html写文章" title="阅读次数">
+            <span id="/2021/09/22/2021/hexo-html/" class="post-meta-item leancloud_visitors" data-flag-title="使用html写文章" title="阅读次数">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -662,7 +595,7 @@
 <p>测试使用html写文章</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2021/09/22/hexo-html/#more" rel="contents">
+              <a class="btn" href="/2021/09/22/2021/hexo-html/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -686,7 +619,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://b.wguan.top/2021/09/22/android-adb/">
+    <link itemprop="mainEntityOfPage" href="https://b.wguan.top/2021/09/22/2021/code-push/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -700,7 +633,95 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/09/22/android-adb/" class="post-title-link" itemprop="url">adb 无线连接教程</a>
+            <a href="/2021/09/22/2021/code-push/" class="post-title-link" itemprop="url">code-push</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-09-22 17:40:00" itemprop="dateCreated datePublished" datetime="2021-09-22T17:40:00+00:00">2021-09-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-09-01 08:38:15" itemprop="dateModified" datetime="2025-09-01T08:38:15+00:00">2025-09-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%B0%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">记录</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/09/22/2021/code-push/" class="post-meta-item leancloud_visitors" data-flag-title="code-push" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>ionic&#x2F;cordova使用code-push更新js资产变更</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/09/22/2021/code-push/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://b.wguan.top/2021/09/22/2021/android-adb/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="passwhl">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="过客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/09/22/2021/android-adb/" class="post-title-link" itemprop="url">adb 无线连接教程</a>
         </h2>
 
         <div class="post-meta">
@@ -730,7 +751,7 @@
             </span>
 
           
-            <span id="/2021/09/22/android-adb/" class="post-meta-item leancloud_visitors" data-flag-title="adb 无线连接教程" title="阅读次数">
+            <span id="/2021/09/22/2021/android-adb/" class="post-meta-item leancloud_visitors" data-flag-title="adb 无线连接教程" title="阅读次数">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -750,7 +771,7 @@
           <p>adb 无线连接教程</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2021/09/22/android-adb/#more" rel="contents">
+              <a class="btn" href="/2021/09/22/2021/android-adb/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -774,7 +795,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://b.wguan.top/2021/09/22/simple-md/">
+    <link itemprop="mainEntityOfPage" href="https://b.wguan.top/2021/09/22/2021/simple-md/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -788,7 +809,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/09/22/simple-md/" class="post-title-link" itemprop="url">精简版Markdown基础语法</a>
+            <a href="/2021/09/22/2021/simple-md/" class="post-title-link" itemprop="url">精简版Markdown基础语法</a>
         </h2>
 
         <div class="post-meta">
@@ -818,7 +839,7 @@
             </span>
 
           
-            <span id="/2021/09/22/simple-md/" class="post-meta-item leancloud_visitors" data-flag-title="精简版Markdown基础语法" title="阅读次数">
+            <span id="/2021/09/22/2021/simple-md/" class="post-meta-item leancloud_visitors" data-flag-title="精简版Markdown基础语法" title="阅读次数">
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
               </span>
@@ -838,7 +859,7 @@
           <p>精简版Markdown基础语法</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2021/09/22/simple-md/#more" rel="contents">
+              <a class="btn" href="/2021/09/22/2021/simple-md/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
