@@ -5,11 +5,11 @@
     <url>/2025/09/01/2025/ionic3%E5%8D%87%E7%BA%A7node20/</url>
     <content><![CDATA[<h2 id="Ionic3升级node20"><a href="#Ionic3升级node20" class="headerlink" title="Ionic3升级node20"></a>Ionic3升级node20</h2><h3 id="迁移node-sass到node，解除node版本强依赖"><a href="#迁移node-sass到node，解除node版本强依赖" class="headerlink" title="迁移node-sass到node，解除node版本强依赖"></a>迁移node-sass到node，解除node版本强依赖</h3><span id="more"></span>
 
-<h3 id="已修改"><a href="#已修改" class="headerlink" title="已修改:"></a>已修改:</h3><h3 id="1-ionic-app-script-3-2-5-tgz-点击下载"><a href="#1-ionic-app-script-3-2-5-tgz-点击下载" class="headerlink" title="1. ionic-app-script-3.2.5.tgz 点击下载"></a>1. ionic-app-script-3.2.5.tgz <a href="/public/ionic-app-script-3.2.5.tgz">点击下载</a></h3><ul>
-<li>node-sass依赖库迁移改为sass  <h3 id="2-ng-packagr-3-0-6-tgz-点击下载"><a href="#2-ng-packagr-3-0-6-tgz-点击下载" class="headerlink" title="2. ng-packagr-3.0.6.tgz 点击下载"></a>2. ng-packagr-3.0.6.tgz <a href="/public/ng-packagr-3.0.6.tgz">点击下载</a></h3></li>
+<h3 id="已修改"><a href="#已修改" class="headerlink" title="已修改:"></a>已修改:</h3><h3 id="1-ionic-app-script-3-2-5-tgz-点击下载"><a href="#1-ionic-app-script-3-2-5-tgz-点击下载" class="headerlink" title="1. ionic-app-script-3.2.5.tgz 点击下载"></a>1. ionic-app-script-3.2.5.tgz <a href="/images/ionic-app-script-3.2.5.tgz?_blank">点击下载</a></h3><ul>
+<li>node-sass依赖库迁移改为sass  <h3 id="2-ng-packagr-3-0-6-tgz-点击下载"><a href="#2-ng-packagr-3-0-6-tgz-点击下载" class="headerlink" title="2. ng-packagr-3.0.6.tgz 点击下载"></a>2. ng-packagr-3.0.6.tgz <a href="/images/ng-packagr-3.0.6.tgz?_blank">点击下载</a></h3></li>
 <li>node_modules&#x2F;ng-packagr&#x2F;lib&#x2F;ng-v5&#x2F;entry-point&#x2F;resources&#x2F;stylesheet.transform.js中的node-sass使用迁移到sass</li>
 </ul>
-<h3 id="3-ion-angular-3-9-10-patch-点击下载"><a href="#3-ion-angular-3-9-10-patch-点击下载" class="headerlink" title="3.ion-angular+3.9.10.patch 点击下载"></a>3.ion-angular+3.9.10.patch <a href="/public/ion-angular+3.9.10.patch">点击下载</a></h3><ul>
+<h3 id="3-ion-angular-3-9-10-patch-点击下载"><a href="#3-ion-angular-3-9-10-patch-点击下载" class="headerlink" title="3.ion-angular+3.9.10.patch 点击下载"></a>3.ion-angular+3.9.10.patch <a href="/images/ion-angular+3.9.10.patch?_blank">点击下载</a></h3><ul>
 <li>使用补丁工具实现node_modules&#x2F;ionic-angular&#x2F;themes&#x2F;ionic.functions.scss中node-sass使用迁移到sass</li>
 </ul>
 <h3 id="4-x2F-deep-x2F-使用"><a href="#4-x2F-deep-x2F-使用" class="headerlink" title="4.&#x2F;deep&#x2F;使用"></a>4.&#x2F;deep&#x2F;使用</h3><ul>
@@ -34,7 +34,7 @@
     <url>/2023/02/28/2021/fanbianyi/</url>
     <content><![CDATA[<p>APK反编译修改后重新打包</p>
 <span id="more"></span>
-<p>&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;<a href="/images/fanbianyi.zip">点击下载工具包</a></p>
+<p>&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;<a href="/images/fanbianyi.zip?_blank">点击下载工具包</a></p>
 <ol>
 <li>本地需要android开发环境</li>
 <li>反解APK到test目录(可直接修改smali目录中的smali代码):<br><code>SET BAT_HOME=%~dp0/tools/apktools &amp;&amp; apktool d test.apk</code>  </li>
@@ -120,7 +120,7 @@
 </ol>
 </li>
 <li>发布更新  <ol>
-<li>安装code-push<br>npm install -g <a href="mailto:&#99;&#111;&#100;&#x65;&#x2d;&#112;&#x75;&#x73;&#x68;&#x40;&#50;&#46;&#49;&#x2e;&#x39;">&#99;&#111;&#100;&#x65;&#x2d;&#112;&#x75;&#x73;&#x68;&#x40;&#50;&#46;&#49;&#x2e;&#x39;</a></li>
+<li>安装code-push<br>npm install -g <a href="mailto:&#99;&#x6f;&#x64;&#101;&#x2d;&#x70;&#x75;&#115;&#x68;&#x40;&#50;&#x2e;&#49;&#x2e;&#57;">&#99;&#x6f;&#x64;&#101;&#x2d;&#x70;&#x75;&#115;&#x68;&#x40;&#50;&#x2e;&#49;&#x2e;&#57;</a></li>
 <li>登录<br>命令行执行: code-push login 服务器地址(<a href="http://localhost:3000/">http://localhost:3000</a>)<br>会自动打开浏览器登录完有个token，复制填入命令行继续</li>
 <li>查看app列表<br>code-push apps list<br>code-push app add test android cordova<br>code-push deployment list test -k<br>code-push deployment add dev</li>
 <li>在项目根目录执行发布<br>先ionic cordova build android&#x2F;ios –prod<br>build后平台下边就会有各自的资源文件<br>code-push release test .&#x2F;platforms&#x2F;android&#x2F;app&#x2F;src&#x2F;main&#x2F;assets&#x2F;www 1.0.0 -d dev</li>
@@ -324,7 +324,7 @@
     <url>/2021/09/22/2021/android-adb/</url>
     <content><![CDATA[<p>adb 无线连接教程</p>
 <span id="more"></span>
-<p><a href="/images/adb.zip">adb下载</a></p>
+<p><a href="/images/adb.zip?_blank">adb下载</a></p>
 <ul>
 <li>开启手机无线连接(手机关机需要重新开启)</li>
 </ul>
