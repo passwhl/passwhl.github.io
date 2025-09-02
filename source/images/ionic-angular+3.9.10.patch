@@ -1,0 +1,211 @@
+diff --git a/node_modules/ionic-angular/components/datetime/datetime.js b/node_modules/ionic-angular/components/datetime/datetime.js
+index d2f3cc6..e0e0454 100644
+--- a/node_modules/ionic-angular/components/datetime/datetime.js
++++ b/node_modules/ionic-angular/components/datetime/datetime.js
+@@ -370,6 +370,8 @@ var DateTime = (function (_super) {
+                 handler: function (data) { return _this.value = data; },
+             }];
+         pickerOptions.buttons = (pickerOptions.buttons || []).concat(defaultButtons);
++        // Add Time Wheel Sensitivity to picker
++        pickerOptions.sensitivity = Number(localStorage.getItem("ManualTimeWheelSensitivity") || localStorage.getItem("DefaultTimeWheelSensitivity"));
+         // Configure picker under the hood
+         var picker = this._picker = this._pickerCtrl.create(pickerOptions);
+         picker.ionChange.subscribe(function () {
+diff --git a/node_modules/ionic-angular/components/picker/picker-column.d.ts b/node_modules/ionic-angular/components/picker/picker-column.d.ts
+index fb0c4ff..55bfb7c 100644
+--- a/node_modules/ionic-angular/components/picker/picker-column.d.ts
++++ b/node_modules/ionic-angular/components/picker/picker-column.d.ts
+@@ -34,6 +34,7 @@ export declare class PickerColumnCmp {
+     debouncer: DomDebouncer;
+     events: UIEventManager;
+     ionChange: EventEmitter<any>;
++    sensitivity: number;
+     constructor(config: Config, _plt: Platform, elementRef: ElementRef, _zone: NgZone, _haptic: Haptic, plt: Platform, domCtrl: DomController);
+     ngAfterViewInit(): void;
+     ngOnDestroy(): void;
+diff --git a/node_modules/ionic-angular/components/picker/picker-column.js b/node_modules/ionic-angular/components/picker/picker-column.js
+index 26872e4..cbfbffc 100644
+--- a/node_modules/ionic-angular/components/picker/picker-column.js
++++ b/node_modules/ionic-angular/components/picker/picker-column.js
+@@ -3,7 +3,7 @@ import { clamp } from '../../util/util';
+ import { Config } from '../../config/config';
+ import { DomController } from '../../platform/dom-controller';
+ import { Haptic } from '../../tap-click/haptic';
+-import { DECELERATION_FRICTION, FRAME_MS, MAX_PICKER_SPEED, PICKER_OPT_SELECTED } from './picker-options';
++import { DECELERATION_FRICTION, FRAME_MS, PICKER_OPT_SELECTED } from './picker-options';
+ import { Platform } from '../../platform/platform';
+ import { pointerCoord } from '../../util/dom';
+ import { UIEventManager } from '../../gestures/ui-event-manager';
+@@ -148,12 +148,14 @@ var PickerColumnCmp = (function () {
+             startPos = i;
+         }
+         if (startPos !== endPos) {
++            console.log("sensitivity------", this.sensitivity);
+             // compute relative movement between these two points
+             var timeOffset = (this.pos[endPos] - this.pos[startPos]);
+             var movedTop = (this.pos[startPos - 1] - this.pos[endPos - 1]);
+             // based on XXms compute the movement to apply for each render step
+             var velocity = ((movedTop / timeOffset) * FRAME_MS);
+-            this.velocity = clamp(-MAX_PICKER_SPEED, velocity, MAX_PICKER_SPEED);
++            var scrollingMaxSpeed = this.sensitivity * 10;
++            this.velocity = clamp(-scrollingMaxSpeed, velocity, scrollingMaxSpeed);
+         }
+         if (Math.abs(endY - this.startY) > 3) {
+             var y = this.y + (endY - this.startY);
+@@ -171,9 +173,9 @@ var PickerColumnCmp = (function () {
+         }
+         else if (Math.abs(this.velocity) > 0) {
+             // still decelerating
+-            this.velocity *= DECELERATION_FRICTION;
++            this.velocity *= this.sensitivity >= 6 ? DECELERATION_FRICTION : Math.pow(DECELERATION_FRICTION, 9 - this.sensitivity).toFixed(2);
+             // do not let it go slower than a velocity of 1
+-            this.velocity = (this.velocity > 0)
++            this.velocity = (this.velocity > 1)
+                 ? Math.max(this.velocity, 1)
+                 : Math.min(this.velocity, -1);
+             y = Math.round(this.y - this.velocity);
+@@ -307,12 +309,9 @@ var PickerColumnCmp = (function () {
+             this.y = y;
+         }
+         if (emitChange) {
+-            if (this.lastIndex === undefined) {
+-                // have not set a last index yet
+-                this.lastIndex = this.col.selectedIndex;
+-            }
+-            else if (this.lastIndex !== this.col.selectedIndex) {
+-                // new selected index has changed from the last index
++            if (this.lastIndex !== this.col.selectedIndex) {
++                // have not set a last index yet or new selected
++                // index has changed from the last index
+                 // update the lastIndex and emit that it has changed
+                 this.lastIndex = this.col.selectedIndex;
+                 var ionChange = this.ionChange;
+@@ -373,6 +372,7 @@ var PickerColumnCmp = (function () {
+         'colEle': [{ type: ViewChild, args: ['colEle',] },],
+         'col': [{ type: Input },],
+         'ionChange': [{ type: Output },],
++        'sensitivity': [{ type: Input },],
+     };
+     return PickerColumnCmp;
+ }());
+diff --git a/node_modules/ionic-angular/components/picker/picker-column.metadata.json b/node_modules/ionic-angular/components/picker/picker-column.metadata.json
+index 0511359..9bb79c0 100644
+--- a/node_modules/ionic-angular/components/picker/picker-column.metadata.json
++++ b/node_modules/ionic-angular/components/picker/picker-column.metadata.json
+@@ -1 +1 @@
+-[{"__symbolic":"module","version":3,"metadata":{"PickerColumnCmp":{"__symbolic":"class","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"Component"},"arguments":[{"selector":".picker-col","template":"<div *ngIf=\"col.prefix\" class=\"picker-prefix\" [style.width]=\"col.prefixWidth\">{{col.prefix}}</div><div class=\"picker-opts\" #colEle [style.max-width]=\"col.optionsWidth\"><button *ngFor=\"let o of col.options; let i=index\"[class.picker-opt-disabled]=\"o.disabled\" class=\"picker-opt\" disable-activated (click)=\"optClick($event, i)\">{{o.text}}</button></div><div *ngIf=\"col.suffix\" class=\"picker-suffix\" [style.width]=\"col.suffixWidth\">{{col.suffix}}</div>","host":{"[style.max-width]":"col.columnWidth","[class.picker-opts-left]":"col.align==\"left\"","[class.picker-opts-right]":"col.align==\"right\"","$quoted$":["[style.max-width]","[class.picker-opts-left]","[class.picker-opts-right]"]}}]}],"members":{"colEle":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"ViewChild"},"arguments":["colEle"]}]}],"col":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"Input"}}]}],"ionChange":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"Output"}}]}],"__ctor__":[{"__symbolic":"constructor","parameters":[{"__symbolic":"reference","module":"../../config/config","name":"Config"},{"__symbolic":"reference","module":"../../platform/platform","name":"Platform"},{"__symbolic":"reference","module":"@angular/core","name":"ElementRef"},{"__symbolic":"reference","module":"@angular/core","name":"NgZone"},{"__symbolic":"reference","module":"../../tap-click/haptic","name":"Haptic"},{"__symbolic":"reference","module":"../../platform/platform","name":"Platform"},{"__symbolic":"reference","module":"../../platform/dom-controller","name":"DomController"}]}],"ngAfterViewInit":[{"__symbolic":"method"}],"ngOnDestroy":[{"__symbolic":"method"}],"pointerStart":[{"__symbolic":"method"}],"pointerMove":[{"__symbolic":"method"}],"pointerEnd":[{"__symbolic":"method"}],"decelerate":[{"__symbolic":"method"}],"optClick":[{"__symbolic":"method"}],"setSelected":[{"__symbolic":"method"}],"update":[{"__symbolic":"method"}],"refresh":[{"__symbolic":"method"}]}}}},{"__symbolic":"module","version":1,"metadata":{"PickerColumnCmp":{"__symbolic":"class","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"Component"},"arguments":[{"selector":".picker-col","template":"<div *ngIf=\"col.prefix\" class=\"picker-prefix\" [style.width]=\"col.prefixWidth\">{{col.prefix}}</div><div class=\"picker-opts\" #colEle [style.max-width]=\"col.optionsWidth\"><button *ngFor=\"let o of col.options; let i=index\"[class.picker-opt-disabled]=\"o.disabled\" class=\"picker-opt\" disable-activated (click)=\"optClick($event, i)\">{{o.text}}</button></div><div *ngIf=\"col.suffix\" class=\"picker-suffix\" [style.width]=\"col.suffixWidth\">{{col.suffix}}</div>","host":{"[style.max-width]":"col.columnWidth","[class.picker-opts-left]":"col.align==\"left\"","[class.picker-opts-right]":"col.align==\"right\""}}]}],"members":{"colEle":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"ViewChild"},"arguments":["colEle"]}]}],"col":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"Input"}}]}],"ionChange":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"Output"}}]}],"__ctor__":[{"__symbolic":"constructor","parameters":[{"__symbolic":"reference","module":"../../config/config","name":"Config"},{"__symbolic":"reference","module":"../../platform/platform","name":"Platform"},{"__symbolic":"reference","module":"@angular/core","name":"ElementRef"},{"__symbolic":"reference","module":"@angular/core","name":"NgZone"},{"__symbolic":"reference","module":"../../tap-click/haptic","name":"Haptic"},{"__symbolic":"reference","module":"../../platform/platform","name":"Platform"},{"__symbolic":"reference","module":"../../platform/dom-controller","name":"DomController"}]}],"ngAfterViewInit":[{"__symbolic":"method"}],"ngOnDestroy":[{"__symbolic":"method"}],"pointerStart":[{"__symbolic":"method"}],"pointerMove":[{"__symbolic":"method"}],"pointerEnd":[{"__symbolic":"method"}],"decelerate":[{"__symbolic":"method"}],"optClick":[{"__symbolic":"method"}],"setSelected":[{"__symbolic":"method"}],"update":[{"__symbolic":"method"}],"refresh":[{"__symbolic":"method"}]}}}}]
+\ No newline at end of file
++[{"__symbolic":"module","version":3,"metadata":{"PickerColumnCmp":{"__symbolic":"class","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"Component"},"arguments":[{"selector":".picker-col","template":"<div *ngIf=\"col.prefix\" class=\"picker-prefix\" [style.width]=\"col.prefixWidth\">{{col.prefix}}</div><div class=\"picker-opts\" #colEle [style.max-width]=\"col.optionsWidth\"><button *ngFor=\"let o of col.options; let i=index\"[class.picker-opt-disabled]=\"o.disabled\" class=\"picker-opt\" disable-activated (click)=\"optClick($event, i)\">{{o.text}}</button></div><div *ngIf=\"col.suffix\" class=\"picker-suffix\" [style.width]=\"col.suffixWidth\">{{col.suffix}}</div>","host":{"[style.max-width]":"col.columnWidth","[class.picker-opts-left]":"col.align==\"left\"","[class.picker-opts-right]":"col.align==\"right\"","$quoted$":["[style.max-width]","[class.picker-opts-left]","[class.picker-opts-right]"]}}]}],"members":{"colEle":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"ViewChild"},"arguments":["colEle"]}]}],"col":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"Input"}}]}],"sensitivity":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"Input"}}]}],"ionChange":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"Output"}}]}],"__ctor__":[{"__symbolic":"constructor","parameters":[{"__symbolic":"reference","module":"../../config/config","name":"Config"},{"__symbolic":"reference","module":"../../platform/platform","name":"Platform"},{"__symbolic":"reference","module":"@angular/core","name":"ElementRef"},{"__symbolic":"reference","module":"@angular/core","name":"NgZone"},{"__symbolic":"reference","module":"../../tap-click/haptic","name":"Haptic"},{"__symbolic":"reference","module":"../../platform/platform","name":"Platform"},{"__symbolic":"reference","module":"../../platform/dom-controller","name":"DomController"}]}],"ngAfterViewInit":[{"__symbolic":"method"}],"ngOnDestroy":[{"__symbolic":"method"}],"pointerStart":[{"__symbolic":"method"}],"pointerMove":[{"__symbolic":"method"}],"pointerEnd":[{"__symbolic":"method"}],"decelerate":[{"__symbolic":"method"}],"optClick":[{"__symbolic":"method"}],"setSelected":[{"__symbolic":"method"}],"update":[{"__symbolic":"method"}],"refresh":[{"__symbolic":"method"}]}}}},{"__symbolic":"module","version":1,"metadata":{"PickerColumnCmp":{"__symbolic":"class","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"Component"},"arguments":[{"selector":".picker-col","template":"<div *ngIf=\"col.prefix\" class=\"picker-prefix\" [style.width]=\"col.prefixWidth\">{{col.prefix}}</div><div class=\"picker-opts\" #colEle [style.max-width]=\"col.optionsWidth\"><button *ngFor=\"let o of col.options; let i=index\"[class.picker-opt-disabled]=\"o.disabled\" class=\"picker-opt\" disable-activated (click)=\"optClick($event, i)\">{{o.text}}</button></div><div *ngIf=\"col.suffix\" class=\"picker-suffix\" [style.width]=\"col.suffixWidth\">{{col.suffix}}</div>","host":{"[style.max-width]":"col.columnWidth","[class.picker-opts-left]":"col.align==\"left\"","[class.picker-opts-right]":"col.align==\"right\""}}]}],"members":{"colEle":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"ViewChild"},"arguments":["colEle"]}]}],"col":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"Input"}}]}],"sensitivity":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"Input"}}]}],"ionChange":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"Output"}}]}],"__ctor__":[{"__symbolic":"constructor","parameters":[{"__symbolic":"reference","module":"../../config/config","name":"Config"},{"__symbolic":"reference","module":"../../platform/platform","name":"Platform"},{"__symbolic":"reference","module":"@angular/core","name":"ElementRef"},{"__symbolic":"reference","module":"@angular/core","name":"NgZone"},{"__symbolic":"reference","module":"../../tap-click/haptic","name":"Haptic"},{"__symbolic":"reference","module":"../../platform/platform","name":"Platform"},{"__symbolic":"reference","module":"../../platform/dom-controller","name":"DomController"}]}],"ngAfterViewInit":[{"__symbolic":"method"}],"ngOnDestroy":[{"__symbolic":"method"}],"pointerStart":[{"__symbolic":"method"}],"pointerMove":[{"__symbolic":"method"}],"pointerEnd":[{"__symbolic":"method"}],"decelerate":[{"__symbolic":"method"}],"optClick":[{"__symbolic":"method"}],"setSelected":[{"__symbolic":"method"}],"update":[{"__symbolic":"method"}],"refresh":[{"__symbolic":"method"}]}}}}]
+\ No newline at end of file
+diff --git a/node_modules/ionic-angular/components/picker/picker-column.ngsummary.json b/node_modules/ionic-angular/components/picker/picker-column.ngsummary.json
+index 5229899..84ec415 100644
+--- a/node_modules/ionic-angular/components/picker/picker-column.ngsummary.json
++++ b/node_modules/ionic-angular/components/picker/picker-column.ngsummary.json
+@@ -1 +1 @@
+-{"summaries":[{"symbol":{"__symbol":0,"members":[]},"metadata":{"__symbolic":"class","members":{"colEle":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbol":1,"members":[]},"arguments":["colEle"]}]}],"col":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbol":2,"members":[]}}]}],"ionChange":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbol":3,"members":[]}}]}],"__ctor__":[{"__symbolic":"constructor","parameters":[{"__symbol":4,"members":[]},{"__symbol":5,"members":[]},{"__symbol":6,"members":[]},{"__symbol":7,"members":[]},{"__symbol":8,"members":[]},{"__symbol":5,"members":[]},{"__symbol":9,"members":[]}]}],"ngAfterViewInit":[{"__symbolic":"method"}],"ngOnDestroy":[{"__symbolic":"method"}],"pointerStart":[{"__symbolic":"method"}],"pointerMove":[{"__symbolic":"method"}],"pointerEnd":[{"__symbolic":"method"}],"decelerate":[{"__symbolic":"method"}],"optClick":[{"__symbolic":"method"}],"setSelected":[{"__symbolic":"method"}],"update":[{"__symbolic":"method"}],"refresh":[{"__symbolic":"method"}]}},"type":{"summaryKind":1,"type":{"reference":{"__symbol":0,"members":[]},"diDeps":[{"isAttribute":false,"isHost":false,"isSelf":false,"isSkipSelf":false,"isOptional":false,"token":{"identifier":{"reference":{"__symbol":4,"members":[]}}}},{"isAttribute":false,"isHost":false,"isSelf":false,"isSkipSelf":false,"isOptional":false,"token":{"identifier":{"reference":{"__symbol":5,"members":[]}}}},{"isAttribute":false,"isHost":false,"isSelf":false,"isSkipSelf":false,"isOptional":false,"token":{"identifier":{"reference":{"__symbol":6,"members":[]}}}},{"isAttribute":false,"isHost":false,"isSelf":false,"isSkipSelf":false,"isOptional":false,"token":{"identifier":{"reference":{"__symbol":7,"members":[]}}}},{"isAttribute":false,"isHost":false,"isSelf":false,"isSkipSelf":false,"isOptional":false,"token":{"identifier":{"reference":{"__symbol":8,"members":[]}}}},{"isAttribute":false,"isHost":false,"isSelf":false,"isSkipSelf":false,"isOptional":false,"token":{"identifier":{"reference":{"__symbol":5,"members":[]}}}},{"isAttribute":false,"isHost":false,"isSelf":false,"isSkipSelf":false,"isOptional":false,"token":{"identifier":{"reference":{"__symbol":9,"members":[]}}}}],"lifecycleHooks":[1,6]},"isComponent":true,"selector":".picker-col","exportAs":null,"inputs":{"col":"col"},"outputs":{"ionChange":"ionChange"},"hostListeners":{},"hostProperties":{"style.max-width":"col.columnWidth","class.picker-opts-left":"col.align==\"left\"","class.picker-opts-right":"col.align==\"right\""},"hostAttributes":{},"providers":[],"viewProviders":[],"queries":[],"viewQueries":[{"selectors":[{"value":"colEle"}],"first":true,"descendants":true,"propertyName":"colEle","read":null}],"entryComponents":[],"changeDetection":1,"template":{"ngContentSelectors":[],"encapsulation":2},"componentViewType":{"__symbol":10,"members":[]},"rendererType":{"__symbol":11,"members":[]},"componentFactory":{"__symbol":12,"members":[]}}}],"symbols":[{"__symbol":0,"name":"PickerColumnCmp","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/dist/ionic-angular/components/picker/picker-column.d.ts"},{"__symbol":1,"name":"ViewChild","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/node_modules/@angular/core/core.d.ts"},{"__symbol":2,"name":"Input","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/node_modules/@angular/core/core.d.ts"},{"__symbol":3,"name":"Output","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/node_modules/@angular/core/core.d.ts"},{"__symbol":4,"name":"Config","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/dist/ionic-angular/config/config.d.ts"},{"__symbol":5,"name":"Platform","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/dist/ionic-angular/platform/platform.d.ts"},{"__symbol":6,"name":"ElementRef","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/node_modules/@angular/core/core.d.ts"},{"__symbol":7,"name":"NgZone","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/node_modules/@angular/core/core.d.ts"},{"__symbol":8,"name":"Haptic","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/dist/ionic-angular/tap-click/haptic.d.ts"},{"__symbol":9,"name":"DomController","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/dist/ionic-angular/platform/dom-controller.d.ts"},{"__symbol":10,"name":"View_PickerColumnCmp_0","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/dist/ionic-angular/components/picker/picker-column.ngfactory.d.ts"},{"__symbol":11,"name":"RenderType_PickerColumnCmp","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/dist/ionic-angular/components/picker/picker-column.ngfactory.d.ts"},{"__symbol":12,"name":"PickerColumnCmpNgFactory","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/dist/ionic-angular/components/picker/picker-column.ngfactory.d.ts"}]}
+\ No newline at end of file
++{"summaries":[{"symbol":{"__symbol":0,"members":[]},"metadata":{"__symbolic":"class","members":{"colEle":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbol":1,"members":[]},"arguments":["colEle"]}]}],"col":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbol":2,"members":[]}}]}],"sensitivity":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbol":2,"members":[]}}]}],"ionChange":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbol":3,"members":[]}}]}],"__ctor__":[{"__symbolic":"constructor","parameters":[{"__symbol":4,"members":[]},{"__symbol":5,"members":[]},{"__symbol":6,"members":[]},{"__symbol":7,"members":[]},{"__symbol":8,"members":[]},{"__symbol":5,"members":[]},{"__symbol":9,"members":[]}]}],"ngAfterViewInit":[{"__symbolic":"method"}],"ngOnDestroy":[{"__symbolic":"method"}],"pointerStart":[{"__symbolic":"method"}],"pointerMove":[{"__symbolic":"method"}],"pointerEnd":[{"__symbolic":"method"}],"decelerate":[{"__symbolic":"method"}],"optClick":[{"__symbolic":"method"}],"setSelected":[{"__symbolic":"method"}],"update":[{"__symbolic":"method"}],"refresh":[{"__symbolic":"method"}]}},"type":{"summaryKind":1,"type":{"reference":{"__symbol":0,"members":[]},"diDeps":[{"isAttribute":false,"isHost":false,"isSelf":false,"isSkipSelf":false,"isOptional":false,"token":{"identifier":{"reference":{"__symbol":4,"members":[]}}}},{"isAttribute":false,"isHost":false,"isSelf":false,"isSkipSelf":false,"isOptional":false,"token":{"identifier":{"reference":{"__symbol":5,"members":[]}}}},{"isAttribute":false,"isHost":false,"isSelf":false,"isSkipSelf":false,"isOptional":false,"token":{"identifier":{"reference":{"__symbol":6,"members":[]}}}},{"isAttribute":false,"isHost":false,"isSelf":false,"isSkipSelf":false,"isOptional":false,"token":{"identifier":{"reference":{"__symbol":7,"members":[]}}}},{"isAttribute":false,"isHost":false,"isSelf":false,"isSkipSelf":false,"isOptional":false,"token":{"identifier":{"reference":{"__symbol":8,"members":[]}}}},{"isAttribute":false,"isHost":false,"isSelf":false,"isSkipSelf":false,"isOptional":false,"token":{"identifier":{"reference":{"__symbol":5,"members":[]}}}},{"isAttribute":false,"isHost":false,"isSelf":false,"isSkipSelf":false,"isOptional":false,"token":{"identifier":{"reference":{"__symbol":9,"members":[]}}}}],"lifecycleHooks":[1,6]},"isComponent":true,"selector":".picker-col","exportAs":null,"inputs":{"col":"col","sensitivity":"sensitivity"},"outputs":{"ionChange":"ionChange"},"hostListeners":{},"hostProperties":{"style.max-width":"col.columnWidth","class.picker-opts-left":"col.align==\"left\"","class.picker-opts-right":"col.align==\"right\""},"hostAttributes":{},"providers":[],"viewProviders":[],"queries":[],"viewQueries":[{"selectors":[{"value":"colEle"}],"first":true,"descendants":true,"propertyName":"colEle","read":null}],"entryComponents":[],"changeDetection":1,"template":{"ngContentSelectors":[],"encapsulation":2},"componentViewType":{"__symbol":10,"members":[]},"rendererType":{"__symbol":11,"members":[]},"componentFactory":{"__symbol":12,"members":[]}}}],"symbols":[{"__symbol":0,"name":"PickerColumnCmp","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/dist/ionic-angular/components/picker/picker-column.d.ts"},{"__symbol":1,"name":"ViewChild","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/node_modules/@angular/core/core.d.ts"},{"__symbol":2,"name":"Input","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/node_modules/@angular/core/core.d.ts"},{"__symbol":3,"name":"Output","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/node_modules/@angular/core/core.d.ts"},{"__symbol":4,"name":"Config","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/dist/ionic-angular/config/config.d.ts"},{"__symbol":5,"name":"Platform","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/dist/ionic-angular/platform/platform.d.ts"},{"__symbol":6,"name":"ElementRef","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/node_modules/@angular/core/core.d.ts"},{"__symbol":7,"name":"NgZone","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/node_modules/@angular/core/core.d.ts"},{"__symbol":8,"name":"Haptic","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/dist/ionic-angular/tap-click/haptic.d.ts"},{"__symbol":9,"name":"DomController","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/dist/ionic-angular/platform/dom-controller.d.ts"},{"__symbol":10,"name":"View_PickerColumnCmp_0","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/dist/ionic-angular/components/picker/picker-column.ngfactory.d.ts"},{"__symbol":11,"name":"RenderType_PickerColumnCmp","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/dist/ionic-angular/components/picker/picker-column.ngfactory.d.ts"},{"__symbol":12,"name":"PickerColumnCmpNgFactory","filePath":"/Users/liamdebeasi/Ionic/ionic-v3/dist/ionic-angular/components/picker/picker-column.ngfactory.d.ts"}]}
+\ No newline at end of file
+diff --git a/node_modules/ionic-angular/components/picker/picker-component.js b/node_modules/ionic-angular/components/picker/picker-component.js
+index 14a2f3b..66f7a95 100644
+--- a/node_modules/ionic-angular/components/picker/picker-component.js
++++ b/node_modules/ionic-angular/components/picker/picker-component.js
+@@ -161,7 +161,7 @@ var PickerCmp = (function () {
+     PickerCmp.decorators = [
+         { type: Component, args: [{
+                     selector: 'ion-picker-cmp',
+-                    template: "\n    <ion-backdrop (click)=\"bdClick()\"></ion-backdrop>\n    <div class=\"picker-wrapper\">\n      <div class=\"picker-toolbar\">\n        <div *ngFor=\"let b of d.buttons\" class=\"picker-toolbar-button\" [ngClass]=\"b.cssRole\">\n          <button ion-button (click)=\"btnClick(b)\" [ngClass]=\"b.cssClass\" class=\"picker-button\" clear>\n            {{b.text}}\n          </button>\n        </div>\n      </div>\n      <div class=\"picker-columns\">\n        <div class=\"picker-above-highlight\"></div>\n        <div *ngFor=\"let c of d.columns\" [col]=\"c\" class=\"picker-col\" (ionChange)=\"_colChange($event)\"></div>\n        <div class=\"picker-below-highlight\"></div>\n      </div>\n    </div>\n  ",
++                    template: "\n    <ion-backdrop (click)=\"bdClick()\"></ion-backdrop>\n    <div class=\"picker-wrapper\">\n      <div class=\"picker-toolbar\">\n        <div *ngFor=\"let b of d.buttons\" class=\"picker-toolbar-button\" [ngClass]=\"b.cssRole\">\n          <button ion-button (click)=\"btnClick(b)\" [ngClass]=\"b.cssClass\" class=\"picker-button\" clear>\n            {{b.text}}\n          </button>\n        </div>\n      </div>\n      <div class=\"picker-columns\">\n        <div class=\"picker-above-highlight\"></div>\n        <div *ngFor=\"let c of d.columns\" [col]=\"c\" [sensitivity]=\"d.sensitivity\" class=\"picker-col\" (ionChange)=\"_colChange($event)\"></div>\n        <div class=\"picker-below-highlight\"></div>\n      </div>\n    </div>\n  ",
+                     host: {
+                         'role': 'dialog'
+                     },
+diff --git a/node_modules/ionic-angular/components/picker/picker-component.metadata.json b/node_modules/ionic-angular/components/picker/picker-component.metadata.json
+index b0e124b..2d1f5d9 100644
+--- a/node_modules/ionic-angular/components/picker/picker-component.metadata.json
++++ b/node_modules/ionic-angular/components/picker/picker-component.metadata.json
+@@ -1 +1 @@
+-[{"__symbolic":"module","version":3,"metadata":{"PickerCmp":{"__symbolic":"class","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"Component"},"arguments":[{"selector":"ion-picker-cmp","template":"\n    <ion-backdrop (click)=\"bdClick()\"></ion-backdrop>\n    <div class=\"picker-wrapper\">\n      <div class=\"picker-toolbar\">\n        <div *ngFor=\"let b of d.buttons\" class=\"picker-toolbar-button\" [ngClass]=\"b.cssRole\">\n          <button ion-button (click)=\"btnClick(b)\" [ngClass]=\"b.cssClass\" class=\"picker-button\" clear>\n            {{b.text}}\n          </button>\n        </div>\n      </div>\n      <div class=\"picker-columns\">\n        <div class=\"picker-above-highlight\"></div>\n        <div *ngFor=\"let c of d.columns\" [col]=\"c\" class=\"picker-col\" (ionChange)=\"_colChange($event)\"></div>\n        <div class=\"picker-below-highlight\"></div>\n      </div>\n    </div>\n  ","host":{"role":"dialog","$quoted$":["role"]},"encapsulation":{"__symbolic":"select","expression":{"__symbolic":"reference","module":"@angular/core","name":"ViewEncapsulation"},"member":"None"}}]}],"members":{"_cols":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"ViewChildren"},"arguments":[{"__symbolic":"reference","module":"./picker-column","name":"PickerColumnCmp"}]}]}],"__ctor__":[{"__symbolic":"constructor","parameters":[{"__symbolic":"reference","module":"../../navigation/view-controller","name":"ViewController"},{"__symbolic":"reference","module":"@angular/core","name":"ElementRef"},{"__symbolic":"reference","module":"../../config/config","name":"Config"},{"__symbolic":"reference","module":"../../gestures/gesture-controller","name":"GestureController"},{"__symbolic":"reference","module":"../../navigation/nav-params","name":"NavParams"},{"__symbolic":"reference","module":"@angular/core","name":"Renderer"}]}],"ionViewWillLoad":[{"__symbolic":"method"}],"ionViewDidLoad":[{"__symbolic":"method"}],"ionViewWillEnter":[{"__symbolic":"method"}],"ionViewDidLeave":[{"__symbolic":"method"}],"refresh":[{"__symbolic":"method"}],"_colChange":[{"__symbolic":"method"}],"_keyUp":[{"__symbolic":"method","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"HostListener"},"arguments":["body:keyup",["$event"]]}]}],"ionViewDidEnter":[{"__symbolic":"method"}],"btnClick":[{"__symbolic":"method"}],"bdClick":[{"__symbolic":"method"}],"dismiss":[{"__symbolic":"method"}],"getSelected":[{"__symbolic":"method"}],"ngOnDestroy":[{"__symbolic":"method"}]}}}},{"__symbolic":"module","version":1,"metadata":{"PickerCmp":{"__symbolic":"class","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"Component"},"arguments":[{"selector":"ion-picker-cmp","template":"\n    <ion-backdrop (click)=\"bdClick()\"></ion-backdrop>\n    <div class=\"picker-wrapper\">\n      <div class=\"picker-toolbar\">\n        <div *ngFor=\"let b of d.buttons\" class=\"picker-toolbar-button\" [ngClass]=\"b.cssRole\">\n          <button ion-button (click)=\"btnClick(b)\" [ngClass]=\"b.cssClass\" class=\"picker-button\" clear>\n            {{b.text}}\n          </button>\n        </div>\n      </div>\n      <div class=\"picker-columns\">\n        <div class=\"picker-above-highlight\"></div>\n        <div *ngFor=\"let c of d.columns\" [col]=\"c\" class=\"picker-col\" (ionChange)=\"_colChange($event)\"></div>\n        <div class=\"picker-below-highlight\"></div>\n      </div>\n    </div>\n  ","host":{"role":"dialog"},"encapsulation":{"__symbolic":"select","expression":{"__symbolic":"reference","module":"@angular/core","name":"ViewEncapsulation"},"member":"None"}}]}],"members":{"_cols":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"ViewChildren"},"arguments":[{"__symbolic":"reference","module":"./picker-column","name":"PickerColumnCmp"}]}]}],"__ctor__":[{"__symbolic":"constructor","parameters":[{"__symbolic":"reference","module":"../../navigation/view-controller","name":"ViewController"},{"__symbolic":"reference","module":"@angular/core","name":"ElementRef"},{"__symbolic":"reference","module":"../../config/config","name":"Config"},{"__symbolic":"reference","module":"../../gestures/gesture-controller","name":"GestureController"},{"__symbolic":"reference","module":"../../navigation/nav-params","name":"NavParams"},{"__symbolic":"reference","module":"@angular/core","name":"Renderer"}]}],"ionViewWillLoad":[{"__symbolic":"method"}],"ionViewDidLoad":[{"__symbolic":"method"}],"ionViewWillEnter":[{"__symbolic":"method"}],"ionViewDidLeave":[{"__symbolic":"method"}],"refresh":[{"__symbolic":"method"}],"_colChange":[{"__symbolic":"method"}],"_keyUp":[{"__symbolic":"method","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"HostListener"},"arguments":["body:keyup",["$event"]]}]}],"ionViewDidEnter":[{"__symbolic":"method"}],"btnClick":[{"__symbolic":"method"}],"bdClick":[{"__symbolic":"method"}],"dismiss":[{"__symbolic":"method"}],"getSelected":[{"__symbolic":"method"}],"ngOnDestroy":[{"__symbolic":"method"}]}}}}]
+\ No newline at end of file
++[{"__symbolic":"module","version":3,"metadata":{"PickerCmp":{"__symbolic":"class","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"Component"},"arguments":[{"selector":"ion-picker-cmp","template":"\n    <ion-backdrop (click)=\"bdClick()\"></ion-backdrop>\n    <div class=\"picker-wrapper\">\n      <div class=\"picker-toolbar\">\n        <div *ngFor=\"let b of d.buttons\" class=\"picker-toolbar-button\" [ngClass]=\"b.cssRole\">\n          <button ion-button (click)=\"btnClick(b)\" [ngClass]=\"b.cssClass\" class=\"picker-button\" clear>\n            {{b.text}}\n          </button>\n        </div>\n      </div>\n      <div class=\"picker-columns\">\n        <div class=\"picker-above-highlight\"></div>\n        <div *ngFor=\"let c of d.columns\" [col]=\"c\" class=\"picker-col\" [sensitivity]=\"d.sensitivity\" (ionChange)=\"_colChange($event)\"></div>\n        <div class=\"picker-below-highlight\"></div>\n      </div>\n    </div>\n  ","host":{"role":"dialog","$quoted$":["role"]},"encapsulation":{"__symbolic":"select","expression":{"__symbolic":"reference","module":"@angular/core","name":"ViewEncapsulation"},"member":"None"}}]}],"members":{"_cols":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"ViewChildren"},"arguments":[{"__symbolic":"reference","module":"./picker-column","name":"PickerColumnCmp"}]}]}],"__ctor__":[{"__symbolic":"constructor","parameters":[{"__symbolic":"reference","module":"../../navigation/view-controller","name":"ViewController"},{"__symbolic":"reference","module":"@angular/core","name":"ElementRef"},{"__symbolic":"reference","module":"../../config/config","name":"Config"},{"__symbolic":"reference","module":"../../gestures/gesture-controller","name":"GestureController"},{"__symbolic":"reference","module":"../../navigation/nav-params","name":"NavParams"},{"__symbolic":"reference","module":"@angular/core","name":"Renderer"}]}],"ionViewWillLoad":[{"__symbolic":"method"}],"ionViewDidLoad":[{"__symbolic":"method"}],"ionViewWillEnter":[{"__symbolic":"method"}],"ionViewDidLeave":[{"__symbolic":"method"}],"refresh":[{"__symbolic":"method"}],"_colChange":[{"__symbolic":"method"}],"_keyUp":[{"__symbolic":"method","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"HostListener"},"arguments":["body:keyup",["$event"]]}]}],"ionViewDidEnter":[{"__symbolic":"method"}],"btnClick":[{"__symbolic":"method"}],"bdClick":[{"__symbolic":"method"}],"dismiss":[{"__symbolic":"method"}],"getSelected":[{"__symbolic":"method"}],"ngOnDestroy":[{"__symbolic":"method"}]}}}},{"__symbolic":"module","version":1,"metadata":{"PickerCmp":{"__symbolic":"class","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"Component"},"arguments":[{"selector":"ion-picker-cmp","template":"\n    <ion-backdrop (click)=\"bdClick()\"></ion-backdrop>\n    <div class=\"picker-wrapper\">\n      <div class=\"picker-toolbar\">\n        <div *ngFor=\"let b of d.buttons\" class=\"picker-toolbar-button\" [ngClass]=\"b.cssRole\">\n          <button ion-button (click)=\"btnClick(b)\" [ngClass]=\"b.cssClass\" class=\"picker-button\" clear>\n            {{b.text}}\n          </button>\n        </div>\n      </div>\n      <div class=\"picker-columns\">\n        <div class=\"picker-above-highlight\"></div>\n        <div *ngFor=\"let c of d.columns\" [col]=\"c\" class=\"picker-col\" [sensitivity]=\"d.sensitivity\" (ionChange)=\"_colChange($event)\"></div>\n        <div class=\"picker-below-highlight\"></div>\n      </div>\n    </div>\n  ","host":{"role":"dialog"},"encapsulation":{"__symbolic":"select","expression":{"__symbolic":"reference","module":"@angular/core","name":"ViewEncapsulation"},"member":"None"}}]}],"members":{"_cols":[{"__symbolic":"property","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"ViewChildren"},"arguments":[{"__symbolic":"reference","module":"./picker-column","name":"PickerColumnCmp"}]}]}],"__ctor__":[{"__symbolic":"constructor","parameters":[{"__symbolic":"reference","module":"../../navigation/view-controller","name":"ViewController"},{"__symbolic":"reference","module":"@angular/core","name":"ElementRef"},{"__symbolic":"reference","module":"../../config/config","name":"Config"},{"__symbolic":"reference","module":"../../gestures/gesture-controller","name":"GestureController"},{"__symbolic":"reference","module":"../../navigation/nav-params","name":"NavParams"},{"__symbolic":"reference","module":"@angular/core","name":"Renderer"}]}],"ionViewWillLoad":[{"__symbolic":"method"}],"ionViewDidLoad":[{"__symbolic":"method"}],"ionViewWillEnter":[{"__symbolic":"method"}],"ionViewDidLeave":[{"__symbolic":"method"}],"refresh":[{"__symbolic":"method"}],"_colChange":[{"__symbolic":"method"}],"_keyUp":[{"__symbolic":"method","decorators":[{"__symbolic":"call","expression":{"__symbolic":"reference","module":"@angular/core","name":"HostListener"},"arguments":["body:keyup",["$event"]]}]}],"ionViewDidEnter":[{"__symbolic":"method"}],"btnClick":[{"__symbolic":"method"}],"bdClick":[{"__symbolic":"method"}],"dismiss":[{"__symbolic":"method"}],"getSelected":[{"__symbolic":"method"}],"ngOnDestroy":[{"__symbolic":"method"}]}}}}]
+\ No newline at end of file
+diff --git a/node_modules/ionic-angular/components/picker/picker-options.d.ts b/node_modules/ionic-angular/components/picker/picker-options.d.ts
+index 43a3261..d1854a0 100644
+--- a/node_modules/ionic-angular/components/picker/picker-options.d.ts
++++ b/node_modules/ionic-angular/components/picker/picker-options.d.ts
+@@ -4,6 +4,7 @@ export interface PickerOptions {
+     cssClass?: string;
+     mode?: string;
+     enableBackdropDismiss?: boolean;
++    sensitivity?: Number;
+ }
+ export interface PickerColumn {
+     name?: string;
+diff --git a/node_modules/ionic-angular/components/picker/picker.js b/node_modules/ionic-angular/components/picker/picker.js
+index aeda6f2..d73299b 100644
+--- a/node_modules/ionic-angular/components/picker/picker.js
++++ b/node_modules/ionic-angular/components/picker/picker.js
+@@ -27,6 +27,7 @@ var Picker = (function (_super) {
+         opts.columns = opts.columns || [];
+         opts.buttons = opts.buttons || [];
+         opts.enableBackdropDismiss = isPresent(opts.enableBackdropDismiss) ? Boolean(opts.enableBackdropDismiss) : true;
++        opts.sensitivity = opts.sensitivity || 6;
+         _this = _super.call(this, PickerCmp, opts, null) || this;
+         _this._app = app;
+         _this.isOverlay = true;
+diff --git a/node_modules/ionic-angular/themes/ionic.functions.scss b/node_modules/ionic-angular/themes/ionic.functions.scss
+index 742cb2e..dad9a93 100644
+--- a/node_modules/ionic-angular/themes/ionic.functions.scss
++++ b/node_modules/ionic-angular/themes/ionic.functions.scss
+@@ -3,37 +3,16 @@
+ // --------------------------------------------------
+ 
+ @function color-error($color-value, $color-name: null) {
+-  $error-msg: "
++  $error-msg: "Invalid color: `#{$color-value}`" + 
++    if($color-name, " (undefined map key: `#{$color-name}`)", "");
+ 
+-  The value `#{$color-value}` must be a color.
+-  If you are setting the value as a map make sure
+-  both the base and contrast are defined as colors.
+-
+-  For example:
+-
+-  $colors: (
+-    primary:    #327eff,
+-    secondary:  (base: #32db64, contrast: #000),
+-  );";
+-
+-  // If there was a name passed it means the value doesn't exist
+-  // so error that the value isn't defined
+-  @if ($color-name) {
+-    $error-msg: "
+-
+-    The map color `#{$color-name}` is not defined.
+-    Please make sure the color exists in your
+-    `$colors` map.
+-
+-    For example:
+-
+-    $colors: (
+-      #{$color-name}:    #327eff
+-    );";
++  @if $color-name {
++    $example: "#{$color-name}: " + if(type-of($color-value) == color, 
++      "#{$color-value}", "rgb(50,126,255)");
++    $error-msg: $error-msg + " Example: $colors: (" + $example + ");";
+   }
+ 
+   @error $error-msg;
+-
+   @return null;
+ }
+ 
+@@ -289,7 +268,7 @@
+       $color-value: color-inverse(map-get($color-value, base));
+     }
+ 
+-  } @elseif ($custom-contrast-mode) {
++  } @else if ($custom-contrast-mode) {
+     // If a mode was passed we need to call
+     // the custom inverse function to get the inverse
+     // color based on the mode

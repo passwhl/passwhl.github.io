@@ -10,7 +10,7 @@ tags:
 ---
 APK反编译修改后重新打包
 <!--more-->
-=====[点击下载工具包](/images/fanbianyi.zip)
+=====[点击下载工具包](/images/fanbianyi.zip?_blank)
 1. 本地需要android开发环境
 2. 反解APK到test目录(可直接修改smali目录中的smali代码):  
 `SET BAT_HOME=%~dp0/tools/apktools && apktool d test.apk`  
