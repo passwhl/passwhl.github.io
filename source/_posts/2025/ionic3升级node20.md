@@ -6,9 +6,11 @@ categories:
 tags:
 - ionic3
 ---
-# Ionic3升级node20
+## Ionic3升级node20
+### 迁移node-sass到node，解除node版本强依赖
+<!--more-->
 
-## 已修改:  
+### 已修改:  
 ### 1. ionic-app-script-3.2.5.tgz [点击下载](/public/ionic-app-script-3.2.5.tgz)
 - node-sass依赖库迁移改为sass  
 ### 2. ng-packagr-3.0.6.tgz [点击下载](/public/ng-packagr-3.0.6.tgz)
