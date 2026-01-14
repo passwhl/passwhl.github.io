@@ -1,15 +1,14 @@
-## hexo搭建博客记录
+### 介绍
+b.wguan.top 基于 hexo + github page 搭建的个人博客站点
 
-### hexo page搭建
-* 创建仓库"用户名.github.io"
+### hexo page 搭建教程
 * 本地安装 node npm git
 * npm install hexo-cli -g
-* clone这个仓库到本地,cd到本地仓库目录
+* 创建仓库"用户名.github.io" clone库到本地 cd到本地仓库目录
 * 创建源码分支，并切换到源码分支
     * git branch source
     * git checkout source
-* 执行hexo init myhexo初始化一个hexo项目
-* 将myhexo中的所有文件剪切到本地仓库根目录
+* 执行hexo init . 初始化一个hexo项目
 * 安装自动部署到git的依赖
     * npm install hexo-deployer-git --save
     * 打开_config.yml配置   
